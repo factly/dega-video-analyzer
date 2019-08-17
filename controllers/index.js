@@ -1,16 +1,33 @@
 'use strict';
 
-var IndexModel = require('../models/index');
+var RatingModel = require('../models/ratings');
+const utils = require('../lib/utils');
 
 
 module.exports = function (router) {
 
-    var model = new IndexModel();
+
 
     router.get('/', function (req, res) {
-        
-        res.send('<code><pre>' + JSON.stringify(model, null, 2) + '</pre></code>');
-        
+        const logger = req.logger;
+        utils.setLogTokens(logger, 'ratings', 'getRating', req.query.client, null);
+        var model = new RatingModel(logger);
+        return model.getRating(
+            req.app.kraken,
+            '',
+            req.query.sortBy,
+            req.query.sortAsc,
+            req.query.limit,
+            req.query.next,
+            req.query.previous
+        ).then((result) => {
+            if (result) {
+                res.status(200).json(result);
+                return;
+            }
+            res.sendStatus(404);
+        }).catch(console.log('err'));
+
     });
 
 };

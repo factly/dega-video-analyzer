@@ -1,12 +1,10 @@
 {
     "databaseConfig": {
-        "uri": "",
+        "uri": "mongodb://localhost:27017/",
         "databases": {
-            "core": "core",
-            "factcheck": "factcheck"
+            "core": "degaUnit",
+            "factcheck": "degaUnit"
         }
-    },
-    "specialization": {
     },
     "middleware": {
         "compress": {
@@ -23,9 +21,9 @@
                     {
                         "writeToDisk": true,
                         "component": "dega_video_analyzer",
-                        "logDir": "/tmp/dega",
+                        "logDir": "./logs",
                         "writeToConsole": true,
-                        "level": "info"
+                        "level": "debug"
                     }
                 ]
             }
