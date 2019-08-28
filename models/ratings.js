@@ -1,8 +1,8 @@
-
 const MongoBase = require('../lib/MongoBase');
 const MongoPaging = require('mongo-cursor-pagination');
 const utils = require('../lib/utils');
 var ObjectId = require('mongodb').ObjectId;
+
 class RatingModel extends MongoBase {
     /**
      * Creates a new RatingModel.
@@ -17,9 +17,7 @@ class RatingModel extends MongoBase {
     getRating(config, clientId, sortBy, sortAsc, limit, next, previous) {
         const query = {};
 
-        if (clientId) {
-            query.client_id = clientId;
-        }
+        query.client_id = clientId;
         const pagingObj = utils.getPagingObject(query, sortBy, sortAsc, limit, next, previous);
         const database = config.get('databaseConfig:databases:factcheck');
         return MongoPaging.find(this.collection(database), pagingObj)
@@ -38,9 +36,10 @@ class RatingModel extends MongoBase {
 
     getRatingDetails(config, clientId, ratingId) {
         const query = {};
-        query['_id'] = ObjectId(ratingId);
+        query._id = ObjectId(ratingId);
+        query.client_id = clientId;
         const database = config.get('databaseConfig:databases:factcheck');
-        return this.collection(database, 'rating').findOne(query)
+        return this.collection(database).findOne(query)
             .then((result) => {
                 this.logger.info('Retrieved the results');
                 const response = {};
@@ -50,7 +49,6 @@ class RatingModel extends MongoBase {
                 (err) => {
                     console.log(err)
                 }
-
             );
     }
 }
