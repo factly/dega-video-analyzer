@@ -3,20 +3,22 @@ const MongoPaging = require('mongo-cursor-pagination');
 const utils = require('../lib/utils');
 var ObjectId = require('mongodb').ObjectId;
 
-class VideoModel extends MongoBase {
+class VideoAnalysisModel extends MongoBase {
     /**
      * Creates a new RatingModel.
      * @param logger The logger to use.
      * @param errorCode The errorCode to use when generating errors.
      */
     constructor(logger) {
-        super(logger, 'video');
+        super(logger, 'video_analysis');
         this.logger = logger;
     }
 
-    getVideoList(config, clientId, sortBy, sortAsc, limit, next, previous) {
+    getVideoAnalysisList(config, clientId, videoId, sortBy, sortAsc, limit, next, previous) {
         const query = {};
+
         query.client_id = clientId;
+        query.video.$id  = videoId;
 
         const pagingObj = utils.getPagingObject(query, sortBy, sortAsc, limit, next, previous);
         const database = config.get('databaseConfig:databases:factcheck');
@@ -34,7 +36,7 @@ class VideoModel extends MongoBase {
             });
     }
 
-    getVideoDetails(config, clientId, videoId) {
+    getVideoAnalysisDetails(config, clientId, videoId) {
         const query = {};
         query._id = ObjectId(videoId);
         query.client_id = clientId;
@@ -48,9 +50,9 @@ class VideoModel extends MongoBase {
             });
     }
 
-    createVideo(config, videoDetails) {
+    createVideoAnalysis(config, videoAnalysisDetails) {
         const database = config.get('databaseConfig:databases:factcheck');
-        return this.collection(database).insertOne(videoDetails)
+        return this.collection(database).insertOne(videoAnalysisDetails)
             .then((result) => {
                 this.logger.info('Retrieved the results');
                 const response = {};
@@ -59,12 +61,25 @@ class VideoModel extends MongoBase {
             });
     }
 
-    updateVideo(config, clientId, videoId, videoDetails) {
+    updateVideoAnalysis(config, clientId, id, videoAnalysisDetails) {
         const query = {};
-        query._id = ObjectId(videoId);
+        query._id = ObjectId(id);
         query.client_id = clientId;
         const database = config.get('databaseConfig:databases:factcheck');
-        return this.collection(database).updateOne(query, videoDetails)
+        return this.collection(database).updateOne(query, videoAnalysisDetails)
+            .then((result) => {
+                this.logger.info('Retrieved the results');
+                const response = {};
+                response.data = result;
+                return response;
+            });
+    }
+
+    deleteVideoAnalysis(config, clientId, id) {
+        const query = {};
+        query._id = ObjectId(id);
+        const database = config.get('databaseConfig:databases:factcheck');
+        return this.collection(database).deleteOne(query)
             .then((result) => {
                 this.logger.info('Retrieved the results');
                 const response = {};
@@ -74,4 +89,4 @@ class VideoModel extends MongoBase {
     }
 }
 
-module.exports = VideoModel;
+module.exports = VideoAnalysisModel;

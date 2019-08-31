@@ -6,10 +6,11 @@ const Joi = require('@hapi/joi');
 function getVideoList(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videos', 'getVideoList', req.query.client, null);
+    const clientId = req.query.client;
     var model = new VideoModel(logger);
     return model.getVideoList(
         req.app.kraken,
-        '',
+        clientId,
         req.query.sortBy,
         req.query.sortAsc,
         req.query.limit,
@@ -32,7 +33,7 @@ function getVideoDetails(req, res, next) {
     var model = new VideoModel(logger);
     return model.getVideoDetails(
         req.app.kraken,
-        '',
+        clientId,
         req.params.videoId
     ).then((result) => {
         if (result) {
@@ -52,7 +53,8 @@ function createVideo(req, res, next) {
         title: Joi.string().required(),
         description: Joi.string(),
         youtube_link: Joi.string().required(),
-        slug: Joi.string().required()
+        slug: Joi.string().required(),
+        status_id: Joi.string().alphanum().min(24).max(24).required(),
     });
 
     const {error, value} = Joi.validate(requestBody, schema);
@@ -60,10 +62,23 @@ function createVideo(req, res, next) {
         return res.status(400).json({error: error.message});
     }
 
+    const videoObj = {
+        'title': value.title,
+        'description': value.description,
+        'youtube_link': value.youtube_link,
+        'slug': value.slug,
+        'client_id': clientId,
+        'status': {
+            '$db': 'core',
+            '$id': value.status_id,
+            '$ref': 'status'
+        }
+    };
+
+
     var model = new VideoModel(logger);
     return model.createVideo(
         req.app.kraken,
-        '',
         value
     ).then((result) => {
         if (result) {
@@ -78,13 +93,14 @@ function updateVideo(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videos', 'updateVideoDetails', req.query.client, null);
     const clientId = req.query.client;
-
+    var requestBody = req.body;
     const schema = Joi.object().keys({
         _id: Joi.string().alphanum().min(24).max(24).required(),
         title: Joi.string().required(),
         description: Joi.string(),
         youtube_link: Joi.string().required(),
-        slug: Joi.string().required()
+        slug: Joi.string().required(),
+        status_id: Joi.string().alphanum().min(24).max(24).required()
     });
 
     const {error, value} = Joi.validate(requestBody, schema);
@@ -92,13 +108,26 @@ function updateVideo(req, res, next) {
         return res.status(400).json({error: error.message});
     }
 
+    const videoObj = {
+        'title': value.title,
+        'description': value.description,
+        'youtube_link': value.youtube_link,
+        'slug': value.slug,
+        'client_id': clientId,
+        'status': {
+            '$db': 'core',
+            '$id': value.status_id,
+            '$ref': 'status'
+        }
+    };
+
 
     var model = new VideoModel(logger);
     return model.updateVideo(
         req.app.kraken,
-        '',
+        clientId,
         req.params.videoId,
-        value
+        videoObj
     ).then((result) => {
         if (result) {
             res.status(200).json(result);
