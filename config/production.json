@@ -1,6 +1,6 @@
 {
     "databaseConfig": {
-        "uri": "mongodb://localhost:27017/core",
+        "uri": "mongodb://root:password@127.0.0.1:27017/admin",
         "databases": {
             "core": "core",
             "factcheck": "factcheck"

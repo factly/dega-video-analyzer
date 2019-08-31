@@ -1,34 +1,66 @@
 {
-
-    
-
-    
-
-    
-    "i18n": {
-        "contentPath": "path:./locales",
-        "fallback": "en-US"
+    "databaseConfig": {
+        "uri": "",
+        "databases": {
+            "core": "core",
+            "factcheck": "factcheck"
+        }
     },
-    
-
     "specialization": {
     },
-
     "middleware": {
-
-        
-
+        "compress": {
+            "priority": 10,
+            "enabled": true
+        },
+        "appsec": {
+            "priority": 110,
+            "module": {
+                "name": "lusca",
+                "arguments": [
+                    {
+                        "csrf": false,
+                        "xframe": "SAMEORIGIN",
+                        "p3p": false,
+                        "csp": false
+                    }
+                ]
+            }
+        },
+        "logger": {
+            "enabled": true,
+            "route": "/*",
+            "priority": 20,
+            "module": {
+                "name": "path:middleware/logHandler",
+                "arguments": [
+                    {
+                        "writeToDisk": true,
+                        "component": "dega_video_analyzer",
+                        "logDir": "/tmp/dega",
+                        "writeToConsole": true,
+                        "level": "info"
+                    }
+                ]
+            }
+        },
         "static": {
             "module": {
                 "arguments": [ "path:./.build" ]
             }
         },
-
         "router": {
             "module": {
                 "arguments": [{ "directory": "path:./controllers" }]
             }
+        },
+        "errorHandler": {
+            "enabled": true,
+            "priority": 140,
+            "module": {
+                "name": "path:middleware/errorHandler",
+                "arguments": []
+            }
         }
-
     }
 }
