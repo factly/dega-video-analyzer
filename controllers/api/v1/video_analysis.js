@@ -1,3 +1,5 @@
+const RatingModel = require('../../../models/ratings');
+const VideoModel = require('../../../models/video');
 const VideoAnalysisModel = require('../../../models/videoAnalysis');
 const utils = require('../../../lib/utils');
 const Joi = require('@hapi/joi');
@@ -49,7 +51,7 @@ function getVideoAnalysisDetails(req, res, next) {
 function createVideoAnalysis(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videoAnalysis', 'createVideoAnalysis', req.query.client, null);
-    const clientId = req.query.client;
+    const clientId = req.query.client || 'default';
     var requestBody = req.body;
     const schema = Joi.object().keys({
         shown_title: Joi.string().required(),
@@ -77,7 +79,7 @@ function createVideoAnalysis(req, res, next) {
         'youtube_link': value.youtube_link,
         'rating': {
             '$id': ObjectId(value.rating_id),
-            '$ref': 'video'
+            '$ref': 'rating'
         },
         'video': {
             '$id': ObjectId(value.video_id),
@@ -87,23 +89,46 @@ function createVideoAnalysis(req, res, next) {
         'client_id': clientId
     };
 
-    let model = new VideoAnalysisModel(logger);
-    return model.createVideoAnalysis(
-        req.app.kraken,
-        videoAnalysisObj
-    ).then((result) => {
-        if (result) {
-            res.status(200).json(result);
-            return;
+    const asyncCreateVideoAnalysisModel = async () => {
+        const ratingDetails = await getRatingDetails(
+            req.app.kraken,
+            clientId,
+            value.rating_id,
+            logger
+        );
+        if (!ratingDetails.data) {
+            return res.status(404).json({'error': 'rating id mismatch'});
         }
-        res.sendStatus(404);
-    }).catch(next);
+        const videoDetails = await getVideoDetails(
+            req.app.kraken,
+            clientId,
+            value.video_id,
+            logger
+        );
+        if (!videoDetails.data) {
+            return res.status(404).json({'error': 'video id mismatch'});
+        }
+        let model = new VideoAnalysisModel(logger);
+        return await model.createVideoAnalysis(
+            req.app.kraken,
+            videoAnalysisObj
+        ).then((result) => {
+            if (result) {
+                res.status(200).json(result);
+                return;
+            }
+            res.sendStatus(404);
+        }).catch(next);
+    };
+
+    asyncCreateVideoAnalysisModel();
+
 }
 
 function updateVideoAnalysis(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videoAnalysis', 'updateVideoAnalysis', req.query.client, null);
-    const clientId = req.query.client;
+    const clientId = req.query.client || 'default';
     let requestBody = req.body;
     const schema = Joi.object().keys({
         _id: Joi.string().alphanum().min(24).max(24).required(),
@@ -132,7 +157,7 @@ function updateVideoAnalysis(req, res, next) {
         'youtube_link': value.youtube_link,
         'rating': {
             '$id': ObjectId(value.rating_id),
-            '$ref': 'video'
+            '$ref': 'rating'
         },
         'video': {
             '$id': ObjectId(value.video_id),
@@ -142,22 +167,65 @@ function updateVideoAnalysis(req, res, next) {
         'client_id': clientId
     };
 
-
-
-    let model = new VideoAnalysisModel(logger);
-    return model.updateVideoAnalysis(
-        req.app.kraken,
-        clientId,
-        req.params.id,
-        videoAnalysisObj
-    ).then((result) => {
-        if (result) {
-            res.status(200).json(result);
-            return;
+    const asyncUpdateVideoAnalysisModel = async () => {
+        const ratingDetails = await getRatingDetails(
+            req.app.kraken,
+            clientId,
+            value.rating_id,
+            logger
+        );
+        if (!ratingDetails.data) {
+            return res.status(404).json({'error': 'rating id mismatch'});
         }
-        res.sendStatus(404);
-    }).catch(next);
+        const videoDetails = await getVideoDetails(
+            req.app.kraken,
+            clientId,
+            value.video_id,
+            logger
+        );
+        if (!videoDetails.data) {
+            return res.status(404).json({'error': 'video id mismatch'});
+        }
+        let model = new VideoAnalysisModel(logger);
+        return model.updateVideoAnalysis(
+            req.app.kraken,
+            clientId,
+            req.params.id,
+            videoAnalysisObj
+        ).then((result) => {
+            if (result) {
+                res.status(200).json(result);
+                return;
+            }
+            return res.status(404).json({'error': 'video id mismatch'});
+        }).catch(next);
+    };
+    asyncUpdateVideoAnalysisModel();
+
 }
+
+function getVideoDetails(config, clientId, videoId, logger) {
+    let model = new VideoModel(logger);
+    return model.getCachedVideoDetails(
+        config,
+        clientId,
+        videoId
+    ).then((result) => {
+        return result;
+    });
+}
+
+function getRatingDetails(config, clientId, ratingId, logger) {
+    let model = new RatingModel(logger);
+    return model.getRatingDetails(
+        config,
+        clientId,
+        ratingId
+    ).then((result) => {
+        return result;
+    });
+}
+
 
 function deleteVideoAnalysis(req, res, next) {
     const logger = req.logger;
@@ -177,7 +245,6 @@ function deleteVideoAnalysis(req, res, next) {
         res.sendStatus(404);
     }).catch(next);
 }
-
 
 
 module.exports = function routes(router) {

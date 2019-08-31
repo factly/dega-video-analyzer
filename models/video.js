@@ -1,7 +1,12 @@
 const MongoBase = require('../lib/MongoBase');
 const MongoPaging = require('mongo-cursor-pagination');
 const utils = require('../lib/utils');
+const Cache = require('../lib/cacheService');
 var ObjectId = require('mongodb').ObjectId;
+
+
+const ttl = 60 * 60 * 6; // cache for 6 Hour
+const cache = new Cache(ttl);
 
 class VideoModel extends MongoBase {
     /**
@@ -45,6 +50,24 @@ class VideoModel extends MongoBase {
                 response.data = result;
                 return response;
             });
+    }
+
+    getCachedVideoDetails(config, clientId, videoId) {
+        const query = {};
+        query._id = ObjectId(videoId);
+        query.client_id = clientId;
+        const database = config.get('databaseConfig:databases:factcheck');
+        const key = `VIDEO_${videoId}`;
+        return cache.get(key, () => this.collection(database).findOne(query)
+            .then((result) => {
+                this.logger.info('Retrieved the results');
+                const response = {};
+                response.data = result;
+                return response;
+            })).then((result) => {
+                return result;
+            }
+        );
     }
 
     createVideo(config, videoDetails) {
