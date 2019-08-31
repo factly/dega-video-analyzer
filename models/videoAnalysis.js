@@ -17,7 +17,7 @@ class VideoAnalysisModel extends MongoBase {
         const query = {};
 
         query.client_id = clientId;
-        query.video.$id = videoId;
+        query.video.$id = ObjectId(videoId);
 
         const pagingObj = utils.getPagingObject(query, sortBy, sortAsc, limit, next, previous);
         const database = config.get('databaseConfig:databases:factcheck');
@@ -77,6 +77,7 @@ class VideoAnalysisModel extends MongoBase {
     deleteVideoAnalysis(config, clientId, id) {
         const query = {};
         query._id = ObjectId(id);
+        query.client_id = clientId;
         const database = config.get('databaseConfig:databases:factcheck');
         return this.collection(database).deleteOne(query)
             .then((result) => {

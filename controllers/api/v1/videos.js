@@ -7,7 +7,7 @@ function getVideoList(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videos', 'getVideoList', req.query.client, null);
     const clientId = req.query.client;
-    var model = new VideoModel(logger);
+    let model = new VideoModel(logger);
     return model.getVideoList(
         req.app.kraken,
         clientId,
@@ -30,7 +30,7 @@ function getVideoDetails(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videos', 'getVideoDetails', req.query.client, null);
     const clientId = req.query.client;
-    var model = new VideoModel(logger);
+    let model = new VideoModel(logger);
     return model.getVideoDetails(
         req.app.kraken,
         clientId,
@@ -48,7 +48,7 @@ function createVideo(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videos', 'createVideoEntry', req.query.client, null);
     const clientId = req.query.client;
-    var requestBody = req.body;
+    let requestBody = req.body;
     const schema = Joi.object().keys({
         title: Joi.string().required(),
         description: Joi.string(),
@@ -79,7 +79,7 @@ function createVideo(req, res, next) {
     var model = new VideoModel(logger);
     return model.createVideo(
         req.app.kraken,
-        value
+        videoObj
     ).then((result) => {
         if (result) {
             res.status(200).json(result);
@@ -122,7 +122,7 @@ function updateVideo(req, res, next) {
     };
 
 
-    var model = new VideoModel(logger);
+    let model = new VideoModel(logger);
     return model.updateVideo(
         req.app.kraken,
         clientId,

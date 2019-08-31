@@ -7,7 +7,6 @@ class RatingModel extends MongoBase {
     /**
      * Creates a new RatingModel.
      * @param logger The logger to use.
-     * @param errorCode The errorCode to use when generating errors.
      */
     constructor(logger) {
         super(logger, 'rating');

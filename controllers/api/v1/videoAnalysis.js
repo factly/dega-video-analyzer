@@ -1,15 +1,17 @@
 const VideoAnalysisModel = require('../../../models/videoAnalysis');
 const utils = require('../../../lib/utils');
 const Joi = require('@hapi/joi');
+const ObjectId = require('mongodb').ObjectId;
 
 
 function getVideoAnalysisList(req, res, next) {
     const logger = req.logger;
+    const clientId = req.query.client;
     utils.setLogTokens(logger, 'videoAnalysis', 'getVideoAnalysisList', req.query.client, null);
-    var model = new VideoAnalysisModel(logger);
+    let model = new VideoAnalysisModel(logger);
     return model.getVideoAnalysisList(
         req.app.kraken,
-        '',
+        clientId,
         req.query.videoId,
         req.query.sortBy,
         req.query.sortAsc,
@@ -28,12 +30,12 @@ function getVideoAnalysisList(req, res, next) {
 
 function getVideoAnalysisDetails(req, res, next) {
     const logger = req.logger;
-    utils.setLogTokens(logger, 'videoAnalysis', 'getVideoAnalysisDetails', req.query.client, null);
     const clientId = req.query.client;
-    var model = new VideoAnalysisModel(logger);
+    utils.setLogTokens(logger, 'videoAnalysis', 'getVideoAnalysisDetails', req.query.client, null);
+    let model = new VideoAnalysisModel(logger);
     return model.getVideoDetails(
         req.app.kraken,
-        '',
+        clientId,
         req.params.videoId
     ).then((result) => {
         if (result) {
@@ -74,21 +76,21 @@ function createVideoAnalysis(req, res, next) {
         'reality_source': value.reality_source,
         'youtube_link': value.youtube_link,
         'rating': {
-            '$id': value.rating_id,
-            '$ref': 'video',
+            '$id': ObjectId(value.rating_id),
+            '$ref': 'video'
         },
         'video': {
-            '$id': value.video_id,
-            '$ref': 'video',
+            '$id': ObjectId(value.video_id),
+            '$ref': 'video'
         },
         'end_time_in_sec': value.end_time_in_sec,
         'client_id': clientId
     };
 
-    var model = new VideoAnalysisModel(logger);
+    let model = new VideoAnalysisModel(logger);
     return model.createVideoAnalysis(
         req.app.kraken,
-        value
+        videoAnalysisObj
     ).then((result) => {
         if (result) {
             res.status(200).json(result);
@@ -102,7 +104,7 @@ function updateVideoAnalysis(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videoAnalysis', 'updateVideoAnalysis', req.query.client, null);
     const clientId = req.query.client;
-
+    let requestBody = req.body;
     const schema = Joi.object().keys({
         _id: Joi.string().alphanum().min(24).max(24).required(),
         shown_title: Joi.string().required(),
@@ -129,12 +131,12 @@ function updateVideoAnalysis(req, res, next) {
         'reality_source': value.reality_source,
         'youtube_link': value.youtube_link,
         'rating': {
-            '$id': value.rating_id,
-            '$ref': 'video',
+            '$id': ObjectId(value.rating_id),
+            '$ref': 'video'
         },
         'video': {
-            '$id': value.video_id,
-            '$ref': 'video',
+            '$id': ObjectId(value.video_id),
+            '$ref': 'video'
         },
         'end_time_in_sec': value.end_time_in_sec,
         'client_id': clientId
@@ -142,12 +144,12 @@ function updateVideoAnalysis(req, res, next) {
 
 
 
-    var model = new VideoAnalysisModel(logger);
+    let model = new VideoAnalysisModel(logger);
     return model.updateVideoAnalysis(
         req.app.kraken,
         clientId,
         req.params.id,
-        value
+        videoAnalysisObj
     ).then((result) => {
         if (result) {
             res.status(200).json(result);
@@ -162,10 +164,10 @@ function deleteVideoAnalysis(req, res, next) {
     utils.setLogTokens(logger, 'videoAnalysis', 'deleteVideoAnalysis', req.query.client, null);
     const clientId = req.query.client;
 
-    var model = new VideoAnalysisModel(logger);
+    let model = new VideoAnalysisModel(logger);
     return model.deleteVideoAnalysis(
         req.app.kraken,
-        '',
+        clientId,
         req.params.id
     ).then((result) => {
         if (result) {
