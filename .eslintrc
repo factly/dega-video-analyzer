@@ -23,5 +23,6 @@
         "browser": true,
         "mocha": true
     },
+    "parser": "babel-eslint",
     "extends": "eslint:recommended"
 }

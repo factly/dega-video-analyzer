@@ -5,9 +5,8 @@ var ObjectId = require('mongodb').ObjectId;
 
 class VideoAnalysisModel extends MongoBase {
     /**
-     * Creates a new RatingModel.
+     * Creates a new videoAnalysisModel.
      * @param logger The logger to use.
-     * @param errorCode The errorCode to use when generating errors.
      */
     constructor(logger) {
         super(logger, 'video_analysis');
@@ -18,7 +17,7 @@ class VideoAnalysisModel extends MongoBase {
         const query = {};
 
         query.client_id = clientId;
-        query.video.$id  = videoId;
+        query.video.$id = videoId;
 
         const pagingObj = utils.getPagingObject(query, sortBy, sortAsc, limit, next, previous);
         const database = config.get('databaseConfig:databases:factcheck');

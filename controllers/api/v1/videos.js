@@ -138,7 +138,6 @@ function updateVideo(req, res, next) {
 }
 
 
-
 module.exports = function routes(router) {
     router.get('/', getVideoList);
     router.post('/', createVideo);

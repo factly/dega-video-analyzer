@@ -5,9 +5,8 @@ var ObjectId = require('mongodb').ObjectId;
 
 class VideoModel extends MongoBase {
     /**
-     * Creates a new RatingModel.
+     * Creates a new VideoModel.
      * @param logger The logger to use.
-     * @param errorCode The errorCode to use when generating errors.
      */
     constructor(logger) {
         super(logger, 'video');
