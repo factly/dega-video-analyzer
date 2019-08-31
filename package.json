@@ -11,6 +11,8 @@
         "all": "npm run build && npm run test"
     },
     "dependencies": {
+        "@hapi/joi": "^15.1.1",
+        "body-parser": "^1.19.0",
         "chance": "^1.0.18",
         "construx": "^1.0.0",
         "construx-copier": "^1.0.0",

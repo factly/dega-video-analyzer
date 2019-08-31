@@ -17,7 +17,7 @@ class VideoModel extends MongoBase {
     getVideoList(config, clientId, sortBy, sortAsc, limit, next, previous) {
         const query = {};
 
-        query.client_id = clientId;
+        // query.client_id = clientId;
 
         const pagingObj = utils.getPagingObject(query, sortBy, sortAsc, limit, next, previous);
         const database = config.get('databaseConfig:databases:factcheck');
@@ -38,7 +38,7 @@ class VideoModel extends MongoBase {
     getVideoDetails(config, clientId, videoId) {
         const query = {};
         query._id = ObjectId(videoId);
-        query.client_id = clientId;
+        // query.client_id = clientId;
         const database = config.get('databaseConfig:databases:factcheck');
         return this.collection(database).findOne(query)
             .then((result) => {
@@ -59,6 +59,19 @@ class VideoModel extends MongoBase {
                 return response;
             });
     }
+
+    updateVideo(config, clientId, videoId, videoDetails) {
+        const query = {};
+        query._id = ObjectId(videoId);
+        const database = config.get('databaseConfig:databases:factcheck');
+        return this.collection(database).updateOne(query, videoDetails)
+            .then((result) => {
+                this.logger.info('Retrieved the results');
+                const response = {};
+                response.data = result;
+                return response;
+            });
+    }
 }
 
-module.exports = RatingModel;
+module.exports = VideoModel;
