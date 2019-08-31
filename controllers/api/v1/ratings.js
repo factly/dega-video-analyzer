@@ -8,7 +8,7 @@ function getRatingList(req, res, next) {
     const clientId = req.query.client;
     return model.getRating(
         req.app.kraken,
-        '',
+        clientId,
         req.query.sortBy,
         req.query.sortAsc,
         req.query.limit,
@@ -31,7 +31,7 @@ function getRatingDetails(req, res, next) {
     var model = new RatingModel(logger);
     return model.getRatingDetails(
         req.app.kraken,
-        '',
+        clientId,
         req.params.ratingId
     ).then((result) => {
         if (result) {

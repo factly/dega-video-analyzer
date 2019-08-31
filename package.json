@@ -23,6 +23,7 @@
         "kraken-js": "^2.0.0",
         "mongo-cursor-pagination": "^7.1.0",
         "mongodb": "^3.3.0",
+        "node-cache": "^4.2.1",
         "winston": "^3.2.1",
         "winston-daily-rotate-file": "^3.10.0"
     },
