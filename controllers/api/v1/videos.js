@@ -54,7 +54,7 @@ function createVideo(req, res, next) {
         description: Joi.string(),
         youtube_link: Joi.string().required(),
         slug: Joi.string().required(),
-        status_id: Joi.string().alphanum().min(24).max(24).required(),
+        status_id: Joi.string().alphanum().min(24).max(24).required()
     });
 
     const {error, value} = Joi.validate(requestBody, schema);

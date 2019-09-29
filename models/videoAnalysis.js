@@ -17,8 +17,7 @@ class VideoAnalysisModel extends MongoBase {
         const query = {};
 
         query.client_id = clientId;
-        query.video.$id = ObjectId(videoId);
-
+        query['video.$id'] = ObjectId(videoId);
         const pagingObj = utils.getPagingObject(query, sortBy, sortAsc, limit, next, previous);
         const database = config.get('databaseConfig:databases:factcheck');
         return MongoPaging.find(this.collection(database), pagingObj)
@@ -26,12 +25,12 @@ class VideoAnalysisModel extends MongoBase {
                 this.logger.info('Retrieved the results');
                 const response = {};
                 response.data = result.results;
-                response.paging = {};
-                response.paging.next = result.next;
-                response.paging.hasNext = result.hasNext;
-                response.paging.previous = result.previous;
-                response.paging.hasPrevious = result.hasPrevious;
-                return response;
+                // response.paging = {};
+                // response.paging.next = result.next;
+                // response.paging.hasNext = result.hasNext;
+                // response.paging.previous = result.previous;
+                // response.paging.hasPrevious = result.hasPrevious;
+                return result.results;
             });
     }
 

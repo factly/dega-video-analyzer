@@ -21,7 +21,7 @@ class RatingModel extends MongoBase {
     getRating(config, clientId, sortBy, sortAsc, limit, next, previous) {
         const query = {};
 
-        // query.client_id = clientId;
+        query.client_id = clientId;
         const pagingObj = utils.getPagingObject(query, sortBy, sortAsc, limit, next, previous);
         const database = config.get('databaseConfig:databases:factcheck');
         const key = 'ALL_RATINGS';

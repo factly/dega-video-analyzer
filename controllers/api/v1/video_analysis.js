@@ -6,39 +6,20 @@ const Joi = require('@hapi/joi');
 const ObjectId = require('mongodb').ObjectId;
 
 
-function getVideoAnalysisList(req, res, next) {
+function getVideoAnalysisDetails(req, res, next) {
     const logger = req.logger;
-    const clientId = req.query.client;
-    utils.setLogTokens(logger, 'videoAnalysis', 'getVideoAnalysisList', req.query.client, null);
+    const clientId = req.query.client || 'default';
+    utils.setLogTokens(logger, 'videoAnalysis', 'getVideoAnalysisDetails', req.query.client, null);
     let model = new VideoAnalysisModel(logger);
     return model.getVideoAnalysisList(
         req.app.kraken,
         clientId,
         req.query.videoId,
-        req.query.sortBy,
-        req.query.sortAsc,
-        req.query.limit,
-        req.query.next,
-        req.query.previous
-    ).then((result) => {
-        if (result) {
-            res.status(200).json(result);
-            return;
-        }
-        res.sendStatus(404);
-    }).catch(next);
-}
-
-
-function getVideoAnalysisDetails(req, res, next) {
-    const logger = req.logger;
-    const clientId = req.query.client;
-    utils.setLogTokens(logger, 'videoAnalysis', 'getVideoAnalysisDetails', req.query.client, null);
-    let model = new VideoAnalysisModel(logger);
-    return model.getVideoDetails(
-        req.app.kraken,
-        clientId,
-        req.params.videoId
+        null,
+        null,
+        null,
+        null,
+        null
     ).then((result) => {
         if (result) {
             res.status(200).json(result);
@@ -101,7 +82,7 @@ function createVideoAnalysis(req, res, next) {
         }
         const videoDetails = await getVideoDetails(
             req.app.kraken,
-            clientId,
+            null,
             value.video_id,
             logger
         );
@@ -248,9 +229,8 @@ function deleteVideoAnalysis(req, res, next) {
 
 
 module.exports = function routes(router) {
-    router.get('/', getVideoAnalysisList);
     router.post('/', createVideoAnalysis);
-    router.get('/:id', getVideoAnalysisDetails);
+    router.get('/', getVideoAnalysisDetails);
     router.put('/:id', updateVideoAnalysis);
     router.delete('/:id', deleteVideoAnalysis);
 };
