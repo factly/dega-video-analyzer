@@ -64,7 +64,7 @@ class VideoAnalysisModel extends MongoBase {
         query._id = ObjectId(id);
         query.client_id = clientId;
         const database = config.get('databaseConfig:databases:factcheck');
-        return this.collection(database).updateOne(query, videoAnalysisDetails)
+        return this.collection(database).findOneAndUpdate(query, {'$set': videoAnalysisDetails}, {returnOriginal: false})
             .then((result) => {
                 this.logger.info('Retrieved the results');
                 const response = {};

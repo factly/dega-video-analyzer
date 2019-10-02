@@ -50,9 +50,12 @@ function createVideo(req, res, next) {
     const clientId = req.query.client;
     let requestBody = req.body;
     const schema = Joi.object().keys({
+        _id: Joi.optional(),
+        createdDate: Joi.optional(),
+        lastUpdatedDate: Joi.optional(),
         title: Joi.string().required(),
         description: Joi.string(),
-        youtube_link: Joi.string().required(),
+        link: Joi.string().required(),
         slug: Joi.string().required(),
         status_id: Joi.string().alphanum().min(24).max(24).required()
     });
@@ -65,7 +68,7 @@ function createVideo(req, res, next) {
     const videoObj = {
         'title': value.title,
         'description': value.description,
-        'youtube_link': value.youtube_link,
+        'link': value.link,
         'slug': value.slug,
         'client_id': clientId,
         'status': {
@@ -96,9 +99,11 @@ function updateVideo(req, res, next) {
     var requestBody = req.body;
     const schema = Joi.object().keys({
         _id: Joi.string().alphanum().min(24).max(24).required(),
+        createdDate: Joi.optional(),
+        lastUpdatedDate: Joi.optional(),
         title: Joi.string().required(),
         description: Joi.string(),
-        youtube_link: Joi.string().required(),
+        link: Joi.string().required(),
         slug: Joi.string().required(),
         status_id: Joi.string().alphanum().min(24).max(24).required()
     });
@@ -111,7 +116,7 @@ function updateVideo(req, res, next) {
     const videoObj = {
         'title': value.title,
         'description': value.description,
-        'youtube_link': value.youtube_link,
+        'link': value.link,
         'slug': value.slug,
         'client_id': clientId,
         'status': {

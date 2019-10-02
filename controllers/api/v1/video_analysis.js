@@ -35,12 +35,15 @@ function createVideoAnalysis(req, res, next) {
     const clientId = req.query.client || 'default';
     var requestBody = req.body;
     const schema = Joi.object().keys({
+        _id: Joi.optional(),
+        createdDate: Joi.optional(),
+        lastUpdatedDate: Joi.optional(),
         shown_title: Joi.string().required(),
         shown_description: Joi.string(),
         reality_title: Joi.string().required(),
         reality_description: Joi.string(),
         reality_source: Joi.string().required(),
-        youtube_link: Joi.string().required(),
+        link: Joi.string().required(),
         rating_id: Joi.string().alphanum().min(24).max(24).required(),
         video_id: Joi.string().alphanum().min(24).max(24).required(),
         end_time_in_sec: Joi.number().required()
@@ -57,14 +60,14 @@ function createVideoAnalysis(req, res, next) {
         'reality_title': value.reality_title,
         'reality_description': value.reality_description,
         'reality_source': value.reality_source,
-        'youtube_link': value.youtube_link,
+        'link': value.link,
         'rating': {
-            '$id': ObjectId(value.rating_id),
-            '$ref': 'rating'
+            '$ref': 'rating',
+            '$id': ObjectId(value.rating_id)
         },
         'video': {
-            '$id': ObjectId(value.video_id),
-            '$ref': 'video'
+            '$ref': 'video',
+            '$id': ObjectId(value.video_id)
         },
         'end_time_in_sec': value.end_time_in_sec,
         'client_id': clientId
@@ -113,12 +116,14 @@ function updateVideoAnalysis(req, res, next) {
     let requestBody = req.body;
     const schema = Joi.object().keys({
         _id: Joi.string().alphanum().min(24).max(24).required(),
+        createdDate: Joi.optional(),
+        lastUpdatedDate: Joi.optional(),
         shown_title: Joi.string().required(),
         shown_description: Joi.string(),
         reality_title: Joi.string().required(),
         reality_description: Joi.string(),
         reality_source: Joi.string().required(),
-        youtube_link: Joi.string().required(),
+        link: Joi.string().required(),
         rating_id: Joi.string().alphanum().min(24).max(24).required(),
         video_id: Joi.string().alphanum().min(24).max(24).required(),
         end_time_in_sec: Joi.number().required()
@@ -128,21 +133,20 @@ function updateVideoAnalysis(req, res, next) {
     if (error) {
         return res.status(400).json({error: error.message});
     }
-
     const videoAnalysisObj = {
         'shown_title': value.shown_title,
         'shown_description': value.shown_description,
         'reality_title': value.reality_title,
         'reality_description': value.reality_description,
         'reality_source': value.reality_source,
-        'youtube_link': value.youtube_link,
+        'link': value.link,
         'rating': {
-            '$id': ObjectId(value.rating_id),
-            '$ref': 'rating'
+            '$ref': 'rating',
+            '$id': ObjectId(value.rating_id)
         },
         'video': {
-            '$id': ObjectId(value.video_id),
-            '$ref': 'video'
+            '$ref': 'video',
+            '$id': ObjectId(value.video_id)
         },
         'end_time_in_sec': value.end_time_in_sec,
         'client_id': clientId
@@ -160,7 +164,7 @@ function updateVideoAnalysis(req, res, next) {
         }
         const videoDetails = await getVideoDetails(
             req.app.kraken,
-            clientId,
+            null,
             value.video_id,
             logger
         );
