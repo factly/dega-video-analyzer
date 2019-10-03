@@ -72,9 +72,9 @@ function createVideo(req, res, next) {
         'slug': value.slug,
         'client_id': clientId,
         'status': {
-            '$db': 'core',
+            '$ref': 'status',
             '$id': value.status_id,
-            '$ref': 'status'
+            '$db': 'core'
         }
     };
 
@@ -120,9 +120,9 @@ function updateVideo(req, res, next) {
         'slug': value.slug,
         'client_id': clientId,
         'status': {
-            '$db': 'core',
+            '$ref': 'status',
             '$id': value.status_id,
-            '$ref': 'status'
+            '$db': 'core'
         }
     };
 
