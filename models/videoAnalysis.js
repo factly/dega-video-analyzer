@@ -77,6 +77,7 @@ class VideoAnalysisModel extends MongoBase {
         const query = {};
         query._id = ObjectId(id);
         query.client_id = clientId;
+        console.log(query)
         const database = config.get('databaseConfig:databases:factcheck');
         return this.collection(database).deleteOne(query)
             .then((result) => {

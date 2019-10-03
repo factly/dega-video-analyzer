@@ -215,7 +215,7 @@ function getRatingDetails(config, clientId, ratingId, logger) {
 function deleteVideoAnalysis(req, res, next) {
     const logger = req.logger;
     utils.setLogTokens(logger, 'videoAnalysis', 'deleteVideoAnalysis', req.query.client, null);
-    const clientId = req.query.client;
+    const clientId = req.query.client || 'default';
 
     let model = new VideoAnalysisModel(logger);
     return model.deleteVideoAnalysis(
